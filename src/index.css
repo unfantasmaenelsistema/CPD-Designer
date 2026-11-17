@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #020617;
+    color: #f1f5f9;
+    letter-spacing: 0.005em;
+  }
+
+  .font-mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Custom crisp range slider for DCIM Rack Inspector */
+input[type="range"].dcim-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 4px;
+  background: #1e293b;
+  outline: none;
+}
+
+input[type="range"].dcim-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: #22d3ee;
+  border: 2px solid #020617;
+  cursor: pointer;
+  transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1), background-color 150ms ease;
+}
+
+input[type="range"].dcim-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  background: #67e8f9;
+}
+
+input[type="range"].dcim-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: #22d3ee;
+  border: 2px solid #020617;
+  cursor: pointer;
+}
+
+/* Subtle diagonal hazard stripes for thermal short-circuit cells */
+.thermal-hazard-bg {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(239, 68, 68, 0.14),
+    rgba(239, 68, 68, 0.14) 6px,
+    rgba(239, 68, 68, 0.03) 6px,
+    rgba(239, 68, 68, 0.03) 12px
+  );
+}
+
+/* Subtle perforated tile dot matrix */
+.perforated-tile-bg {
+  background-image: radial-gradient(rgba(34, 211, 238, 0.35) 1.2px, transparent 1.2px);
+  background-size: 6px 6px;
+}
