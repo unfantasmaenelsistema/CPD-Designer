@@ -248,6 +248,7 @@ export interface ProjectData {
   tia942Config?: Tia942Config;
   auditChecklist?: AuditChecklist;
   unlockedFlags?: string[];
+  activeMissionId?: CtfMissionId;
 }
 
 export interface CtfObjective {

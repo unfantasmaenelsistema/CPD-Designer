@@ -43,8 +43,30 @@ import {
   TileType,
   UpsConfig,
 } from './types';
+import {
+  sanitizeChecklist,
+  sanitizeFlags,
+  sanitizeGrid,
+  sanitizeGridOrPreset,
+  sanitizeThermalConfig,
+  sanitizeTiaConfig,
+  sanitizeUpsConfig,
+} from './engine/projectSanitizer';
 
 const STORAGE_KEY = 'cpd_designer_state_v1';
+
+function readSavedProject(): Partial<ProjectData> | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as unknown;
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+      ? (parsed as Partial<ProjectData>)
+      : null;
+  } catch {
+    return null;
+  }
+}
 
 interface ToastMessage {
   id: number;
@@ -53,114 +75,24 @@ interface ToastMessage {
 }
 
 export default function App() {
-  const [grid, setGrid] = useState<GridCell[][]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as Partial<ProjectData>;
-        if (
-          Array.isArray(parsed.grid) &&
-          parsed.grid.length === GRID_ROWS &&
-          parsed.grid[0]?.length === GRID_COLS
-        ) {
-          return parsed.grid;
-        }
-      }
-    } catch {
-      // Fallback to standard preset
-    }
-    return createStandardPresetGrid();
-  });
+  // Proyecto guardado en este navegador, saneado una sola vez (rangos de la interfaz, tipos y flags válidas)
+  const [saved] = useState(() => readSavedProject());
 
-  const [cacEnabled, setCacEnabled] = useState<boolean>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as Partial<ProjectData>;
-        if (typeof parsed.cacEnabled === 'boolean') return parsed.cacEnabled;
-      }
-    } catch {
-      // Ignore
-    }
-    return true;
-  });
+  const [grid, setGrid] = useState<GridCell[][]>(() => sanitizeGridOrPreset(saved?.grid));
+  const [cacEnabled, setCacEnabled] = useState<boolean>(() =>
+    typeof saved?.cacEnabled === 'boolean' ? saved.cacEnabled : true
+  );
+  const [upsConfig, setUpsConfig] = useState<UpsConfig>(() => sanitizeUpsConfig(saved?.upsConfig));
+  const [thermalConfig, setThermalConfig] = useState<ThermalConfig>(() =>
+    sanitizeThermalConfig(saved?.thermalConfig)
+  );
+  const [tiaConfig, setTiaConfig] = useState<Tia942Config>(() => sanitizeTiaConfig(saved?.tia942Config));
+  const [auditChecklist, setAuditChecklist] = useState<AuditChecklist>(() =>
+    sanitizeChecklist(saved?.auditChecklist)
+  );
+  const [unlockedFlags, setUnlockedFlags] = useState<string[]>(() => sanitizeFlags(saved?.unlockedFlags));
 
-  const [upsConfig, setUpsConfig] = useState<UpsConfig>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as Partial<ProjectData>;
-        if (parsed.upsConfig) {
-          return { ...DEFAULT_UPS_CONFIG, ...parsed.upsConfig };
-        }
-      }
-    } catch {
-      // Ignore
-    }
-    return DEFAULT_UPS_CONFIG;
-  });
-
-  const [thermalConfig, setThermalConfig] = useState<ThermalConfig>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as Partial<ProjectData>;
-        if (parsed.thermalConfig) {
-          return { ...DEFAULT_THERMAL_CONFIG, ...parsed.thermalConfig };
-        }
-      }
-    } catch {
-      // Ignore
-    }
-    return DEFAULT_THERMAL_CONFIG;
-  });
-
-  const [tiaConfig, setTiaConfig] = useState<Tia942Config>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as Partial<ProjectData>;
-        if (parsed.tia942Config) {
-          return { ...DEFAULT_TIA942_CONFIG, ...parsed.tia942Config };
-        }
-      }
-    } catch {
-      // Ignore
-    }
-    return DEFAULT_TIA942_CONFIG;
-  });
-
-  const [auditChecklist, setAuditChecklist] = useState<AuditChecklist>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as Partial<ProjectData>;
-        if (parsed.auditChecklist) {
-          return { ...DEFAULT_AUDIT_CHECKLIST, ...parsed.auditChecklist };
-        }
-      }
-    } catch {
-      // Ignore
-    }
-    return DEFAULT_AUDIT_CHECKLIST;
-  });
-
-  const [unlockedFlags, setUnlockedFlags] = useState<string[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as Partial<ProjectData>;
-        if (Array.isArray(parsed.unlockedFlags)) {
-          return parsed.unlockedFlags.filter((f): f is string => typeof f === 'string');
-        }
-      }
-    } catch {
-      // Ignore
-    }
-    return [];
-  });
-
-  const [mode, setMode] = useState<AppMode>('free');
+  const [mode, setMode] = useState<AppMode>(() => (saved?.mode === 'ctf' ? 'ctf' : 'free'));
   const [activeTab, setActiveTab] = useState<TabId>('floor');
   const [activeTool, setActiveTool] = useState<BrushTool>('inspect');
   const [defaultOrientation, setDefaultOrientation] = useState<RackOrientation>('south');
@@ -168,7 +100,11 @@ export default function App() {
     row: 1,
     col: 5,
   });
-  const [activeMissionId, setActiveMissionId] = useState<CtfMissionId>('ctf-1');
+  const [activeMissionId, setActiveMissionId] = useState<CtfMissionId>(() =>
+    (['ctf-1', 'ctf-2', 'ctf-3', 'ctf-4'] as const).includes(saved?.activeMissionId as CtfMissionId)
+      ? (saved?.activeMissionId as CtfMissionId)
+      : 'ctf-1'
+  );
   const [toast, setToast] = useState<ToastMessage | null>(null);
 
   const showToast = useCallback((text: string, tone: ToastMessage['tone'] = 'info') => {
@@ -196,12 +132,13 @@ export default function App() {
         tia942Config: tiaConfig,
         auditChecklist,
         unlockedFlags,
+        activeMissionId,
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     } catch {
       // Ignore storage quota issues
     }
-  }, [grid, cacEnabled, mode, upsConfig, thermalConfig, tiaConfig, auditChecklist, unlockedFlags]);
+  }, [grid, cacEnabled, mode, upsConfig, thermalConfig, tiaConfig, auditChecklist, unlockedFlags, activeMissionId]);
 
   // Real-time spatial thermal validation, KPIs, UPS, TIA-942, Audit & CTF (synced across Phases 1-5)
   const analysis = useMemo(() => analyzeFloorGrid(grid, cacEnabled), [grid, cacEnabled]);
@@ -254,16 +191,19 @@ export default function App() {
     [grid, kpis, analysis, cacEnabled, upsConfig, upsCalc, tiaEval, auditReport]
   );
 
-  // Auto-unlock CTF flags upon completing mission objectives
+  // Auto-unlock CTF flags upon completing mission objectives.
+  // Solo cuenta el reto cargado en modo Misiones: en modo libre la sala tipo ya cumplía casi todo
+  // (por ejemplo, la flag del SAI salía con solo subir la autonomía objetivo a 20 min).
   useEffect(() => {
+    if (mode !== 'ctf') return;
     const newlyUnlocked = missions
-      .filter((m) => m.completed && !unlockedFlags.includes(m.flag))
+      .filter((m) => m.id === activeMissionId && m.completed && !unlockedFlags.includes(m.flag))
       .map((m) => m.flag);
     if (newlyUnlocked.length > 0) {
       setUnlockedFlags((prev) => Array.from(new Set([...prev, ...newlyUnlocked])));
       showToast(`Flag desbloqueada: ${newlyUnlocked[0]}`, 'success');
     }
-  }, [missions, unlockedFlags, showToast]);
+  }, [missions, unlockedFlags, showToast, mode, activeMissionId]);
 
   const selectedCell = useMemo(() => {
     if (!selectedCoord) return null;
@@ -493,35 +433,21 @@ export default function App() {
       const reader = new FileReader();
       reader.onload = () => {
         try {
-          const parsed = JSON.parse(String(reader.result)) as Partial<ProjectData>;
-          if (
-            !Array.isArray(parsed.grid) ||
-            parsed.grid.length !== GRID_ROWS ||
-            parsed.grid[0]?.length !== GRID_COLS
-          ) {
-            showToast('El archivo JSON no contiene una matriz válida 12×8.', 'error');
+          const parsed = JSON.parse(String(reader.result)) as Partial<ProjectData> | null;
+          const importedGrid = sanitizeGrid(parsed?.grid);
+          if (!parsed || !importedGrid) {
+            showToast('El archivo JSON no contiene un plano válido de 8 filas × 12 columnas.', 'error');
             return;
           }
-          setGrid(parsed.grid);
+          // Cada valor se limita al rango de su control y las flags NO se importan: se desbloquean solas
+          // si el diseño importado cumple los objetivos de la misión.
+          setGrid(importedGrid);
           if (typeof parsed.cacEnabled === 'boolean') setCacEnabled(parsed.cacEnabled);
           if (parsed.mode === 'free' || parsed.mode === 'ctf') setMode(parsed.mode);
-          if (parsed.upsConfig) {
-            setUpsConfig({ ...DEFAULT_UPS_CONFIG, ...parsed.upsConfig });
-          }
-          if (parsed.thermalConfig) {
-            setThermalConfig({ ...DEFAULT_THERMAL_CONFIG, ...parsed.thermalConfig });
-          }
-          if (parsed.tia942Config) {
-            setTiaConfig({ ...DEFAULT_TIA942_CONFIG, ...parsed.tia942Config });
-          }
-          if (parsed.auditChecklist) {
-            setAuditChecklist({ ...DEFAULT_AUDIT_CHECKLIST, ...parsed.auditChecklist });
-          }
-          if (Array.isArray(parsed.unlockedFlags)) {
-            setUnlockedFlags(
-              parsed.unlockedFlags.filter((f): f is string => typeof f === 'string')
-            );
-          }
+          setUpsConfig(sanitizeUpsConfig(parsed.upsConfig));
+          setThermalConfig(sanitizeThermalConfig(parsed.thermalConfig));
+          setTiaConfig(sanitizeTiaConfig(parsed.tia942Config));
+          setAuditChecklist(sanitizeChecklist(parsed.auditChecklist));
           setSelectedCoord(null);
           showToast('Proyecto importado correctamente.', 'success');
         } catch {

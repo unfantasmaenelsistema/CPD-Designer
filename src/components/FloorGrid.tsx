@@ -143,12 +143,12 @@ export const FloorGrid: React.FC<FloorGridProps> = ({
               </button>
               <span
                 className={`font-mono text-xs font-semibold ${
-                  activeMission.completed || unlockedFlags.includes(activeMission.flag)
+                  unlockedFlags.includes(activeMission.flag)
                     ? 'text-emerald-400'
                     : 'text-amber-400'
                 }`}
               >
-                {activeMission.completed || unlockedFlags.includes(activeMission.flag)
+                {unlockedFlags.includes(activeMission.flag)
                   ? activeMission.flag
                   : 'EN PROGRESO'}
               </span>

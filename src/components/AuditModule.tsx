@@ -405,7 +405,7 @@ export const AuditModule: React.FC<AuditModuleProps> = ({
                 <span>Modo Entrenamiento: Misiones CTF de Ingeniería Crítica</span>
               </h2>
               <p className="text-xs text-slate-400 mt-0.5">
-                Activa un reto para cargar el escenario averiado, resuélvelo entre los módulos del simulador y desbloquea automáticamente su Flag.
+                Pulsa «Cargar Reto» para abrir el escenario averiado, resuélvelo entre los módulos del simulador y su Flag se desbloquea sola. Las flags solo se ganan con el reto cargado (en modo libre los objetivos se marcan, pero no dan flag).
               </p>
             </div>
             <div className="font-mono text-xs font-semibold text-emerald-400">
@@ -415,8 +415,7 @@ export const AuditModule: React.FC<AuditModuleProps> = ({
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {missions.map((mission) => {
-              const isUnlocked =
-                mission.completed || unlockedFlags.includes(mission.flag);
+              const isUnlocked = unlockedFlags.includes(mission.flag);
               const isCurrent = activeMissionId === mission.id;
 
               return (
@@ -492,7 +491,9 @@ export const AuditModule: React.FC<AuditModuleProps> = ({
                       </>
                     ) : (
                       <span className="font-mono text-[11px] text-slate-500">
-                        FLAG BLOQUEADA — Completa todos los requisitos en vivo
+                        {mission.completed
+                          ? 'OBJETIVOS CUMPLIDOS — Carga este reto para ganar la flag'
+                          : 'FLAG BLOQUEADA — Completa todos los requisitos en vivo'}
                       </span>
                     )}
                   </div>

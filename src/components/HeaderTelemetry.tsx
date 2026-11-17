@@ -106,7 +106,7 @@ export const HeaderTelemetry: React.FC<HeaderTelemetryProps> = ({
             className="shrink-0 flex items-center justify-center rounded-lg bg-slate-900 border border-slate-800 p-1 hover:border-cyan-500/60 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
           >
             <img
-              src="./assets/aistudio/icono_81a3db5b.png"
+              src="./assets/logo.png"
               alt="Logo Un Fantasma en el Sistema"
               className="h-9 w-9 object-contain"
               referrerPolicy="no-referrer"
@@ -125,7 +125,7 @@ export const HeaderTelemetry: React.FC<HeaderTelemetryProps> = ({
                 DCIM &amp; TIA-942 Engineering Suite
               </span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-slate-500">
+            <div className="flex flex-wrap items-center gap-x-2 text-xs text-slate-500">
               <a
                 href="https://www.unfantasmaenelsistema.com/"
                 target="_blank"
@@ -142,7 +142,7 @@ export const HeaderTelemetry: React.FC<HeaderTelemetryProps> = ({
         </div>
 
         {/* Mode & Project Actions */}
-        <div className="flex items-center gap-2.5 flex-wrap shrink-0">
+        <div className="flex items-center gap-2.5 flex-wrap min-w-0">
           <div
             role="group"
             aria-label="Selector de modo"

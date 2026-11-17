@@ -1,12 +1,36 @@
+<div align="center">
+  <a href="https://www.unfantasmaenelsistema.com/">
+    <img src="./public/assets/logo.png" alt="Logo de Un Fantasma en el Sistema" width="88" />
+  </a>
+
 # CPD Designer — DCIM & TIA-942 Engineering Suite
+
+[![Probar en GitHub Pages](https://img.shields.io/badge/Probar-en%20el%20navegador-06b6d4?style=flat-square&logo=github)](https://unfantasmaenelsistema.github.io/CPD-Designer/)
+[![React 19 + Tailwind 4](https://img.shields.io/badge/Stack-React%2019%20%2B%20Tailwind%204-10b981?style=flat-square)](#instalación-y-desarrollo-local)
+[![Licencia MIT](https://img.shields.io/badge/Licencia-MIT-f59e0b?style=flat-square)](./LICENSE)
+
+**[▶ Abrir el simulador](https://unfantasmaenelsistema.github.io/CPD-Designer/)**
+</div>
 
 Simulador interactivo profesional y educativo de diseño, cálculo electromecánico, termodinámica, topología de redundancia **ANSI/TIA-942** y auditoría técnica de Centros de Proceso de Datos (CPD / Data Centers), ejecutado **100% en cliente (sin backend)** y preparado para despliegue estático en **GitHub Pages**.
 
 Autoría y proyecto educativo vinculado a [unfantasmaenelsistema.com](https://www.unfantasmaenelsistema.com/).
 
+## Tabla de Contenidos
+
+- [Capturas de Pantalla](#capturas-de-pantalla)
+- [Módulos de Ingeniería](#módulos-de-ingeniería)
+- [Modo Entrenamiento: Misiones CTF](#modo-entrenamiento-misiones-ctf)
+- [Instalación y Desarrollo Local](#instalación-y-desarrollo-local)
+- [Despliegue en GitHub Pages](#despliegue-en-github-pages)
+- [Novedades de la versión 2](#novedades-de-la-versión-2)
+- [Licencia](#licencia)
+
 ---
 
 ## Capturas de Pantalla
+
+> Capturas de la versión 2 tomadas sobre la compilación de producción (en la última, el reto CTF-02 cargado y resuelto).
 
 ### 1. Plano 2D de Suelo Técnico & Pasillos Fríos/Calientes
 ![Plano 2D de Suelo Técnico](./docs/screenshots/tab1_floor_grid.png)
@@ -23,6 +47,9 @@ Autoría y proyecto educativo vinculado a [unfantasmaenelsistema.com](https://ww
 ### 5. Auditoría Técnica Live Linter, Informe PDF & Misiones CTF
 ![Auditoría de Sala Técnica](./docs/screenshots/tab5_audit_ctf.png)
 ![Misiones CTF de Ingeniería Crítica](./docs/screenshots/tab5_ctf_missions.png)
+
+### 6. Versión móvil
+<img src="./docs/screenshots/movil.png" alt="CPD Designer en un móvil" width="300" />
 
 ---
 
@@ -51,37 +78,36 @@ Autoría y proyecto educativo vinculado a [unfantasmaenelsistema.com](https://ww
 5. **Auditoría Técnica & Misiones CTF**
    - **Live Engineering Linter**: escaneo integral (Críticos, Graves, Leves y Conformes) sobre capacidad SAI, CRAC `N+1`, flujo de aire 2D, agente limpio `NOVEC/FM-200`, prohibición explícita de rociadores húmedos sobre racks, ASHRAE, PUE `< 1.50`, puesta a tierra equipotencial **TIA-607 (CBN/Mesh-BN)**, sensores de inundación (*Leak Detection Rope*) y pulsador **EPO** con cubeta protectora.
    - **Generador de Informe Técnico**: vista previa limpia imprimible en PDF (`window.print()`) con dictamen firmado y tabla resumen de cálculos.
-   - **Persistencia local (`localStorage`) + Exportación/Importación JSON** + botón de reinicio de fábrica.
+   - **Persistencia local (`localStorage`) + Exportación/Importación JSON** + botón de reinicio de fábrica. Al cargar o importar, cada valor se limita al rango de su control en la interfaz y las flags no se importan: se desbloquean solas si el diseño cumple el reto.
 
 ---
 
 ## Modo Entrenamiento: Misiones CTF
 
-Activa cualquier misión desde **Modo Misiones CTF** o en la Pestaña 5 (**Cargar Reto**) para desplegar el escenario averiado y desbloquear su *Flag* automáticamente al cumplir todos los criterios en tiempo real:
+Pulsa **Cargar Reto** en la Pestaña 5 para desplegar el escenario averiado de cada misión. Su *Flag* se desbloquea automáticamente al cumplir todos los criterios en tiempo real **con ese reto cargado** (modo Misiones CTF). En modo libre los objetivos se marcan igualmente, pero no dan flag.
 
-| Código | Misión | Enfoque Técnico | Flag |
-| :--- | :--- | :--- | :--- |
-| `CTF-01` | **Horno en el CPD Municipal** | Pasillos frío/caliente, rejillas perforadas y CRAC para >= 85.000 BTU/h con PUE <= 1.55 | `FLAG{COLD_AISLE_THERMAL_MASTER}` |
-| `CTF-02` | **Apagón de 20 Minutos** | SAI On-Line VFI, >= 20% margen, redundancia `N+1`, bus 384V DC y >= 20 min reales | `FLAG{UPS_ONLINE_AUTONOMY_OK}` |
-| `CTF-03` | **El Falso Tier III** | Eliminación de SPOFs en TIA-942, 100% racks A+B y PUE < 1.45 | `FLAG{TIA942_CONCURRENT_MAINTENANCE}` |
-| `CTF-04` | **Arquitecto High-Density IA** | Diseño desde cero >= 40 kW IT (STD + HD-AI), CAC, NOVEC 1230, SAI >= 15 min, clima `N+1`, Tier III/IV y 0 críticos | `FLAG{DCIM_CHIEF_ENGINEER_PRO}` |
+| Código | Misión | Enfoque Técnico |
+| :--- | :--- | :--- |
+| `CTF-01` | **Horno en el CPD Municipal** | Pasillos frío/caliente, rejillas perforadas y CRAC para >= 85.000 BTU/h con PUE <= 1.55 |
+| `CTF-02` | **Apagón de 20 Minutos** | SAI On-Line VFI, >= 20% margen, redundancia `N+1`, bus 384V DC y >= 20 min reales |
+| `CTF-03` | **El Falso Tier III** | Eliminación de SPOFs en TIA-942, 100% racks A+B y PUE < 1.45 |
+| `CTF-04` | **Arquitecto High-Density IA** | Diseño desde cero >= 40 kW IT (STD + HD-AI), CAC, NOVEC 1230, SAI >= 15 min, clima `N+1`, Tier III/IV y 0 críticos |
+
+Las flags se calculan en el navegador: son una evidencia educativa para la clase, no una prueba frente a quien lea el código.
 
 ---
 
 ## Instalación y Desarrollo Local
 
-Requisitos: **Node.js 20+** y **npm**.
+Requisitos: **[Bun](https://bun.sh/)** (el proyecto usa `bun.lock`).
 
 ```bash
-# 1. Clonar el repositorio e instalar dependencias
-npm install
-
-# 2. Iniciar servidor de desarrollo (puerto 3000)
-npm run dev
-
-# 3. Verificación de tipos TypeScript y build estático de producción
-npm run lint
-npm run build
+git clone https://github.com/unfantasmaenelsistema/CPD-Designer.git
+cd CPD-Designer
+bun install
+bun run dev        # http://localhost:3000
+bun run lint       # comprobación de tipos con TypeScript
+bun run build      # genera ./dist para publicar
 ```
 
 La compilación genera la carpeta estática `dist/` con rutas relativas (`base: './'` en `vite.config.ts`).
@@ -90,8 +116,27 @@ La compilación genera la carpeta estática `dist/` con rutas relativas (`base: 
 
 ## Despliegue en GitHub Pages
 
-El repositorio incluye el flujo automatizado `.github/workflows/deploy.yml`:
+El flujo [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml) se ejecuta en cada `push` a `main`: instala con Bun (`bun install --frozen-lockfile`), compila `./dist` y lo publica en https://unfantasmaenelsistema.github.io/CPD-Designer/ (en **Settings → Pages**, la fuente es **GitHub Actions**).
 
-1. Sube el proyecto a un repositorio de GitHub en la rama `main`.
-2. Ve a **Settings → Pages → Build and deployment → Source** y selecciona **GitHub Actions**.
-3. Cada `push` a `main` ejecutará `npm ci`, `npm run build` y publicará automáticamente `dist/` en GitHub Pages sin configuración adicional ni servidor backend.
+---
+
+## Novedades de la versión 2
+
+- **Publicado en GitHub Pages.** El workflow fallaba en segundos (`npm ci` sin `package-lock.json`) y Pages no estaba activado; ahora compila con Bun.
+- **Flags que hay que ganarse.**
+  - En modo libre, la sala tipo ya cumplía casi todo: la flag del SAI salía con solo subir la autonomía objetivo a 20 min, y las tarjetas mostraban la flag en cuanto se cumplían los objetivos.
+  - Ahora las flags solo se ganan con el reto cargado. El modo y el reto activo se guardan, así que el progreso sigue tras recargar.
+- **Proyectos guardados e importados validados.**
+  - Un valor fuera de los rangos de la interfaz (por ejemplo, baterías de 999 999 Ah) entraba tal cual.
+  - Las flags del archivo se daban por capturadas, aunque fueran inventadas.
+  - Un plano con celdas vacías o mal formadas dejaba la página en blanco, y seguía así en cada recarga.
+  - Ahora cada número se limita a su control, cada celda se reconstruye con su tipo, solo valen flags reales y las flags no se importan.
+- **Móvil:** la cabecera ya no se sale de la pantalla.
+- **Licencia MIT** (el repositorio no tenía `LICENSE`).
+- **Limpieza:** fuera Gemini, Express, `motion`, el plugin de copia de AI Studio, `metadata.json` y `.env.example`. El logo pasa a `public/assets/logo.png` y también es el favicon. El escritorio queda idéntico píxel a píxel en las cinco pestañas, salvo el texto nuevo del panel de misiones.
+
+---
+
+## Licencia
+
+Distribuido bajo la licencia [MIT](./LICENSE).
