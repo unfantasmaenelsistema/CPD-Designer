@@ -30,6 +30,14 @@ export const BTU_PER_TR = 12000;
 export const LIGHTING_W_PER_M2 = 20;
 export const BTU_PER_PERSON = 450;
 
+/** Flags de las cuatro misiones (también sirven para validar el progreso guardado). */
+export const CTF_FLAGS: string[] = [
+  'FLAG{COLD_AISLE_THERMAL_MASTER}',
+  'FLAG{UPS_ONLINE_AUTONOMY_OK}',
+  'FLAG{TIA942_CONCURRENT_MAINTENANCE}',
+  'FLAG{DCIM_CHIEF_ENGINEER_PRO}',
+];
+
 export const DEFAULT_UPS_CONFIG: UpsConfig = {
   manualExtraKw: 0,
   manualPowerFactor: 0.95,
@@ -1346,7 +1354,7 @@ export function evaluateCtfMissions(
       subtitle: 'Pasillos y Termodinámica',
       brief:
         'Reorienta los racks en pasillo frío/caliente, reubica las baldosas perforadas fuera del pasillo caliente y dimensiona las unidades CRAC para >= 85,000 BTU/h con PUE <= 1.55.',
-      flag: 'FLAG{COLD_AISLE_THERMAL_MASTER}',
+      flag: CTF_FLAGS[0],
       objectives: m1Objectives,
       completed: m1Objectives.every((o) => o.passed),
     },
@@ -1357,7 +1365,7 @@ export function evaluateCtfMissions(
       subtitle: 'Ingeniería de SAI',
       brief:
         'Ante cortes frecuentes sobre 18 kW IT (FP 0.9), configura un SAI On-Line VFI con >= 20% de margen, redundancia N+1 y banco de baterías de 384V DC con >= 20 min reales.',
-      flag: 'FLAG{UPS_ONLINE_AUTONOMY_OK}',
+      flag: CTF_FLAGS[1],
       objectives: m2Objectives,
       completed: m2Objectives.every((o) => o.passed),
     },
@@ -1368,7 +1376,7 @@ export function evaluateCtfMissions(
       subtitle: 'Auditoría TIA-942',
       brief:
         'Detecta y elimina los Puntos Únicos de Fallo (SPOF) ocultos en fibra, anillo hidráulico, combustible o racks hasta lograr un Tier III real en los 4 subsistemas con PUE < 1.45.',
-      flag: 'FLAG{TIA942_CONCURRENT_MAINTENANCE}',
+      flag: CTF_FLAGS[2],
       objectives: m3Objectives,
       completed: m3Objectives.every((o) => o.passed),
     },
@@ -1379,7 +1387,7 @@ export function evaluateCtfMissions(
       subtitle: 'Diseño Integral',
       brief:
         'Diseña desde cero un CPD >= 40 kW IT combinando racks STD y HD-IA, CAC, NOVEC 1230, SAI >= 15 min, clima N+1, Tier III/IV y 0 hallazgos críticos en la Auditoría Física.',
-      flag: 'FLAG{DCIM_CHIEF_ENGINEER_PRO}',
+      flag: CTF_FLAGS[3],
       objectives: m4Objectives,
       completed: m4Objectives.every((o) => o.passed),
     },

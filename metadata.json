@@ -1,6 +1,0 @@
-{
-  "name": "CPD Designer",
-  "description": "Simulador educativo y profesional de diseño de Centros de Datos, cálculo electromecánico, climatización y auditoría TIA-942.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
