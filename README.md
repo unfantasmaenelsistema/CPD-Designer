@@ -73,6 +73,7 @@ Autoría y proyecto educativo vinculado a [unfantasmaenelsistema.com](https://ww
 4. **Topología Tier ANSI/TIA-942 & Regla del Eslabón Más Débil**
    - Configurador de los 4 subsistemas (**Eléctrico**, **Mecánico/Clima**, **Telecomunicaciones** y **Arquitectónico**).
    - Motor de evaluación que aplica el principio de cadena crítica: el nivel Tier global (`Tier I` a `Tier IV`) queda limitado por el subsistema más débil.
+   - La redundancia de climatización se lee del plano: `N+1` exige una CRAC de reserva y `2(N+1)` dos sistemas completos con su reserva (con N = 2, seis CRAC). Elegirla a mano solo simula un escenario peor; nunca añade máquinas que no estén en el plano.
    - Simulador interactivo de fallos y mantenimiento concurrente sobre un diagrama unifilar SVG para visualizar Puntos Únicos de Fallo (**SPOF**).
 
 5. **Auditoría Técnica & Misiones CTF**

@@ -833,7 +833,10 @@ export const ThermalModule: React.FC<ThermalModuleProps> = ({
                 </div>
                 <div className="font-mono text-[11px] text-slate-300 leading-relaxed">
                   PUE = ({kpis.totalItKw.toFixed(1)} IT +{' '}
-                  {(kpis.cracElectricalKw + kpis.thermalPenaltyKw).toFixed(1)} Clima +{' '}
+                  {kpis.cracElectricalKw.toFixed(1)} Clima +{' '}
+                  {kpis.thermalPenaltyKw > 0 && (
+                    <>{kpis.thermalPenaltyKw.toFixed(1)} Penaliz. térmica +{' '}</>
+                  )}
                   {electricalLossKw.toFixed(1)} SAI/PDU +{' '}
                   {kpis.lightingEnvelopeKw.toFixed(2)} Ilum) / {kpis.totalItKw.toFixed(1)}
                 </div>

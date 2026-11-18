@@ -366,22 +366,40 @@ export function evaluateTia942Subsystems(
   }
 
   // 2. MECHANICAL SUBSYSTEM
-  let effectiveMechanicalRedundancy: 'N' | 'N+1' | '2(N+1)' = 'N';
-  if (tiaConfig.mechanicalRedundancySource === 'from_floor') {
-    const floorTwoN =
-      kpis.cracCount >= 4 && kpis.totalCoolingCapacityKw - 50 >= kpis.totalHeatKw;
-    const floorNPlus1 =
-      kpis.cracCount >= 2 && kpis.totalCoolingCapacityKw - 25 >= kpis.totalHeatKw;
-    effectiveMechanicalRedundancy = floorTwoN ? '2(N+1)' : floorNPlus1 ? 'N+1' : 'N';
-  } else {
-    effectiveMechanicalRedundancy = tiaConfig.mechanicalRedundancySource;
+  // La redundancia real sale siempre del plano. N = CRAC necesarios para la carga;
+  // N+1 = una unidad de reserva; 2(N+1) = dos sistemas completos con su reserva.
+  const REDUNDANCY_RANK = { N: 0, 'N+1': 1, '2(N+1)': 2 } as const;
+  const cracUnitKw = kpis.cracCount > 0 ? kpis.totalCoolingCapacityKw / kpis.cracCount : 25;
+  const cracNeededN = Math.max(1, Math.ceil(kpis.totalHeatKw / cracUnitKw));
+  const floorTwoN = kpis.cracCount >= 2 * (cracNeededN + 1);
+  const floorNPlus1 =
+    kpis.cracCount >= 2 && kpis.totalCoolingCapacityKw - cracUnitKw >= kpis.totalHeatKw;
+  const floorRedundancy: 'N' | 'N+1' | '2(N+1)' = floorTwoN
+    ? '2(N+1)'
+    : floorNPlus1
+    ? 'N+1'
+    : 'N';
+
+  // Elegir N, N+1 o 2(N+1) a mano simula un escenario peor (p. ej. una unidad
+  // fuera de servicio), pero nunca añade máquinas que no estén en el plano.
+  let effectiveMechanicalRedundancy: 'N' | 'N+1' | '2(N+1)' = floorRedundancy;
+  let manualAboveFloor = false;
+  if (tiaConfig.mechanicalRedundancySource !== 'from_floor') {
+    const manual = tiaConfig.mechanicalRedundancySource;
+    if (REDUNDANCY_RANK[manual] <= REDUNDANCY_RANK[floorRedundancy]) {
+      effectiveMechanicalRedundancy = manual;
+    } else {
+      manualAboveFloor = true;
+    }
   }
 
   let mechTierNum: 1 | 2 | 3 | 4 = 1;
   let mechBottleneck = '';
   const hasCoolingCapacity =
-    tiaConfig.mechanicalRedundancySource !== 'from_floor' ||
-    (kpis.cracCount > 0 && kpis.totalCoolingCapacityKw >= kpis.totalHeatKw);
+    kpis.cracCount > 0 && kpis.totalCoolingCapacityKw >= kpis.totalHeatKw;
+  const manualNote = manualAboveFloor
+    ? ` La redundancia ${tiaConfig.mechanicalRedundancySource} elegida a mano no se cumple en el plano (${kpis.cracCount} CRAC; N = ${cracNeededN}): se evalúa ${floorRedundancy}.`
+    : '';
 
   if (
     hasCoolingCapacity &&
@@ -401,7 +419,9 @@ export function evaluateTia942Subsystems(
   ) {
     mechTierNum = 3;
     const missing4: string[] = [];
-    if (effectiveMechanicalRedundancy !== '2(N+1)') missing4.push('redundancia 2(N+1)');
+    if (effectiveMechanicalRedundancy !== '2(N+1)') {
+      missing4.push(`redundancia 2(N+1) (${2 * (cracNeededN + 1)} CRAC para N = ${cracNeededN})`);
+    }
     if (!cacEnabled) missing4.push('cerramiento CAC');
     mechBottleneck = `Mantenible concurrentemente (N+1 + doble anillo). Para Tier IV falta: ${missing4.join(', ')}.`;
   } else if (
@@ -423,6 +443,7 @@ export function evaluateTia942Subsystems(
       ? 'Déficit de capacidad frigorífica CRAC frente a carga térmica de sala.'
       : 'Climatización sin redundancia (N): el fallo de 1 CRAC sobrecalienta el CPD.';
   }
+  mechBottleneck += manualNote;
 
   // 3. TELECOM SUBSYSTEM
   let telecomTierNum: 1 | 2 | 3 | 4 = 1;
@@ -1353,7 +1374,7 @@ export function evaluateCtfMissions(
       title: 'Horno en el CPD Municipal',
       subtitle: 'Pasillos y Termodinámica',
       brief:
-        'Reorienta los racks en pasillo frío/caliente, reubica las baldosas perforadas fuera del pasillo caliente y dimensiona las unidades CRAC para >= 85,000 BTU/h con PUE <= 1.55.',
+        'Reorienta los racks en pasillo frío/caliente, deja las baldosas perforadas solo en el pasillo frío y dimensiona las unidades CRAC para >= 85,000 BTU/h con PUE <= 1.55.',
       flag: CTF_FLAGS[0],
       objectives: m1Objectives,
       completed: m1Objectives.every((o) => o.passed),

@@ -69,7 +69,7 @@ export const CATALOG_ITEMS: CatalogItem[] = [
     name: 'Unidad CRAC / InRow',
     shortName: 'CRAC 25 kWt',
     category: 'cooling',
-    description: 'Climatizadora de precisión: 25 kW térmicos de extracción, consumo 4.5 kW.',
+    description: 'Climatizadora de precisión: 25 kW térmicos de extracción; consume según la carga y el COP de la planta.',
     defaultPowerKw: 0,
     defaultPowerFactor: 0.92,
     defaultUUsed: 0,
@@ -241,7 +241,7 @@ export interface CtfScenarioBundle {
 
 export function createCtfScenario(missionId: CtfMissionId): CtfScenarioBundle {
   if (missionId === 'ctf-1') {
-    // Misión 1: "Horno en el CPD Municipal" (~24.5 kW IT -> >85,000 BTU/h, bad orientation, perforated in hot aisle, only 1 CRAC)
+    // Misión 1: "Horno en el CPD Municipal" (28.5 kW IT -> >85,000 BTU/h, recirculación en F03, perforadas que acaban en el pasillo caliente al girar F04, 1 solo CRAC)
     const grid = createEmptyGrid();
     for (let c = 0; c < GRID_COLS; c++) {
       grid[0][c] = createCell(0, c, 'blind');
@@ -262,8 +262,7 @@ export function createCtfScenario(missionId: CtfMissionId): CtfScenarioBundle {
     });
     // Row 3: Misoriented racks facing South -> blowing hot exhaust North into Row 2!
     [3, 4, 5, 6].forEach((c) => {
-      const type: TileType = c === 4 ? 'rack_hd' : 'rack_std'; // 3*3.5 + 12 = 22.5? Wait: row1=14 + row3=22.5 -> 36.5? Let's make 7 std racks = 24.5 kW
-      grid[3][c] = createCell(3, c, type === 'rack_hd' ? 'rack_std' : 'rack_std', 'south', {
+      grid[3][c] = createCell(3, c, 'rack_std', 'south', {
         powerKw: c === 5 ? 4.0 : 3.5,
         dualPower: true,
       });

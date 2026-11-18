@@ -426,7 +426,12 @@ export const InspectorSidebar: React.FC<InspectorSidebarProps> = ({
                     <span>Consumo Eléctrico</span>
                   </div>
                   <div className="font-mono text-sm font-semibold text-slate-100 mt-1">
-                    4.5 kW
+                    {kpis.cracCount > 0
+                      ? `${(kpis.cracElectricalKw / kpis.cracCount).toFixed(1)} kW`
+                      : '—'}
+                  </div>
+                  <div className="text-[10px] text-slate-500 mt-0.5">
+                    Media por CRAC según la carga actual
                   </div>
                 </div>
               </div>
